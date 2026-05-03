@@ -63,3 +63,14 @@ export function parsePatterns(raw) {
     .map(parseBlock)
     .filter(Boolean);
 }
+
+export function parseSolvedProblem(raw) {
+  const titleMatch = raw.match(/^##\s+(.+)$/m);
+  const title = titleMatch ? titleMatch[1].trim() : 'Untitled';
+
+  const codeMatch = raw.match(/```(\w*)\n([\s\S]*?)```/);
+  const language = codeMatch ? codeMatch[1] : '';
+  const code = codeMatch ? codeMatch[2].trim() : raw.trim();
+
+  return { title, language, code };
+}

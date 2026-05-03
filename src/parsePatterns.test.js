@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parsePatterns, slugify } from './parsePatterns';
+import { parsePatterns, slugify, parseSolvedProblem } from './parsePatterns';
 
 const SAMPLE = `# Sliding Window
 <!-- phase: 1, topic: Arrays & Hash Maps -->
@@ -99,5 +99,39 @@ describe('slugify', () => {
   });
   it('handles arrow symbols', () => {
     expect(slugify('Brute force → optimize')).toBe('brute-force-optimize');
+  });
+});
+
+describe('parseSolvedProblem', () => {
+  it('extracts title from h2', () => {
+    const raw = '## Two Sum\n\n```python\nreturn []\n```';
+    expect(parseSolvedProblem(raw).title).toBe('Two Sum');
+  });
+
+  it('extracts language from code fence', () => {
+    const raw = '## Two Sum\n\n```python\nreturn []\n```';
+    expect(parseSolvedProblem(raw).language).toBe('python');
+  });
+
+  it('extracts code content without the fence', () => {
+    const raw = '## Two Sum\n\n```python\nreturn []\n```';
+    expect(parseSolvedProblem(raw).code).toBe('return []');
+  });
+
+  it('returns empty string for language when fence has no tag', () => {
+    const raw = '## Foo\n\n```\nsome code\n```';
+    expect(parseSolvedProblem(raw).language).toBe('');
+  });
+
+  it('falls back to "Untitled" when no h2 present', () => {
+    const raw = '```python\npass\n```';
+    expect(parseSolvedProblem(raw).title).toBe('Untitled');
+  });
+
+  it('falls back to raw content when no code fence present', () => {
+    const raw = '## Foo\n\njust prose';
+    const result = parseSolvedProblem(raw);
+    expect(result.code).toBe('## Foo\n\njust prose'.trim());
+    expect(result.language).toBe('');
   });
 });

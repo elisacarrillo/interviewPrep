@@ -1,9 +1,19 @@
 import { useState } from "react";
 import PatternPage from "./PatternPage";
-import { parsePatterns } from "./parsePatterns";
+import { parsePatterns, parseSolvedProblem } from "./parsePatterns";
 import patternsRaw from "./patterns.md?raw";
 
 const parsedPatterns = parsePatterns(patternsRaw);
+
+const rawFiles = import.meta.glob('../docs/completed_problems/*.md', {
+  eager: true,
+  query: '?raw',
+  import: 'default',
+});
+
+const solvedProblems = Object.entries(rawFiles)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([, raw]) => parseSolvedProblem(raw));
 
 const plan = {
   phases: [
@@ -181,160 +191,230 @@ export default function StudyPlan() {
       padding: "32px 24px",
       boxSizing: "border-box"
     }}>
-      {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 11, letterSpacing: 3, color: "#666", textTransform: "uppercase", marginBottom: 8 }}>
-          Partiful Interview Prep
-        </div>
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: "'DM Serif Display', Georgia, serif", lineHeight: 1.1 }}>
-          10-Day Study Plan
-        </h1>
-        <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, height: 4, background: "#1E1E22", borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #E8007A, #FF85C2)", borderRadius: 2, transition: "width 0.4s ease" }} />
-          </div>
-          <span style={{ fontSize: 12, color: "#888", whiteSpace: "nowrap" }}>{doneCount}/{totalProblems} done</span>
-        </div>
-      </div>
-
-      {/* Phase tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
-        {plan.phases.map((p, i) => (
-          <button key={i} onClick={() => setActivePhase(i)} style={{
-            background: activePhase === i ? p.color : "#1A1A1E",
-            color: activePhase === i ? "#fff" : "#888",
-            border: "none",
-            borderRadius: 8,
-            padding: "8px 16px",
-            fontSize: 12,
-            fontFamily: "inherit",
-            cursor: "pointer",
-            fontWeight: 600,
-            transition: "all 0.2s",
-            letterSpacing: 0.5
-          }}>
-            {p.label} · {p.duration}
+      {/* Top-level nav */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
+        {[
+          { key: 'plan', label: 'Study Plan' },
+          { key: 'solved', label: 'Solved Problems' },
+        ].map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setView(key)}
+            style={{
+              background: view === key ? '#FF4F9A' : '#1A1A1E',
+              color: view === key ? '#fff' : '#888',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 16px',
+              fontSize: 12,
+              fontFamily: 'inherit',
+              cursor: 'pointer',
+              fontWeight: 600,
+              transition: 'all 0.2s',
+              letterSpacing: 0.5,
+            }}
+          >
+            {label}
           </button>
         ))}
       </div>
 
-      {/* Phase card */}
-      <div style={{ background: "#13131A", borderRadius: 16, padding: "24px", marginBottom: 20, border: `1px solid ${phase.color}22` }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, fontFamily: "'DM Serif Display', Georgia, serif", color: phase.color }}>{phase.title}</span>
-          <span style={{ fontSize: 11, color: "#555", letterSpacing: 1 }}>{phase.duration}</span>
-        </div>
-        <p style={{ margin: 0, fontSize: 13, color: "#AAA", lineHeight: 1.6 }}>{phase.goal}</p>
-      </div>
-
-      {/* Topics */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
-        {phase.topics.map((topic, ti) => (
-          <div key={ti} style={{ background: "#13131A", borderRadius: 12, padding: "20px", border: "1px solid #1E1E28" }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: "#F0EEF8", marginBottom: 12 }}>
-              {topic.ds}
+      {view === 'solved' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {solvedProblems.length === 0 ? (
+            <div style={{ color: '#555', fontSize: 13, textAlign: 'center', padding: 40 }}>
+              No solved problems yet.
             </div>
-
-            {/* Patterns */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, letterSpacing: 2, color: "#555", textTransform: "uppercase", marginBottom: 6 }}>Patterns</div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {topic.patterns.map((p, pi) => (
-                  <span
-                    key={pi}
-                    onClick={() => {
-                      setActivePatternKey({ phaseIndex: activePhase, topicIndex: ti, patternName: p });
-                      setView('pattern');
-                    }}
-                    style={{
-                      background: phase.accent + "22",
-                      color: phase.color,
-                      fontSize: 11,
-                      padding: "3px 10px",
-                      borderRadius: 20,
-                      border: `1px solid ${phase.color}33`,
-                      cursor: 'pointer',
-                      transition: 'opacity 0.15s',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.75')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-                  >{p}</span>
-                ))}
-              </div>
-            </div>
-
-            {/* Problems */}
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 10, letterSpacing: 2, color: "#555", textTransform: "uppercase", marginBottom: 8 }}>Problems</div>
-              {topic.problems.map((prob, pi) => {
-                const key = `${activePhase}-${ti}-${pi}`;
-                const done = checked[key];
-                return (
-                  <div key={pi} onClick={() => toggle(key)} style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "7px 0", cursor: "pointer",
-                    borderBottom: pi < topic.problems.length - 1 ? "1px solid #1E1E28" : "none"
-                  }}>
-                    <span style={{ color: done ? phase.color : "#333", flexShrink: 0 }}><CheckIcon /></span>
+          ) : (
+            solvedProblems.map(({ title, language, code }, i) => (
+              <div key={i} style={{ background: '#13131A', borderRadius: 12, padding: '20px', border: '1px solid #1E1E28' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: '#F0EEF8' }}>{title}</span>
+                  {language && (
                     <span style={{
-                      fontSize: 13,
-                      color: done ? "#555" : "#CCC",
-                      textDecoration: done ? "line-through" : "none",
-                      transition: "all 0.2s"
-                    }}>{prob}</span>
-                  </div>
-                );
-              })}
+                      background: '#FF4F9A22',
+                      color: '#FF4F9A',
+                      fontSize: 11,
+                      padding: '2px 8px',
+                      borderRadius: 20,
+                      border: '1px solid #FF4F9A33',
+                    }}>{language}</span>
+                  )}
+                </div>
+                <pre style={{
+                  background: '#0D0D12',
+                  borderRadius: 8,
+                  padding: 16,
+                  fontSize: 12,
+                  color: '#CCC',
+                  overflowX: 'auto',
+                  fontFamily: 'inherit',
+                  margin: 0,
+                }}>
+                  <code>{code}</code>
+                </pre>
+              </div>
+            ))
+          )}
+        </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ fontSize: 11, letterSpacing: 3, color: "#666", textTransform: "uppercase", marginBottom: 8 }}>
+              Partiful Interview Prep
             </div>
-
-            {/* Tip */}
-            <div style={{
-              background: "#0D0D12",
-              borderLeft: `3px solid ${phase.color}`,
-              padding: "10px 14px",
-              borderRadius: "0 6px 6px 0",
-              fontSize: 12,
-              color: "#888",
-              lineHeight: 1.6
-            }}>
-              💡 {topic.tip}
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: "'DM Serif Display', Georgia, serif", lineHeight: 1.1 }}>
+              10-Day Study Plan
+            </h1>
+            <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ flex: 1, height: 4, background: "#1E1E22", borderRadius: 2, overflow: "hidden" }}>
+                <div style={{ width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #E8007A, #FF85C2)", borderRadius: 2, transition: "width 0.4s ease" }} />
+              </div>
+              <span style={{ fontSize: 12, color: "#888", whiteSpace: "nowrap" }}>{doneCount}/{totalProblems} done</span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Partiful-specific tips */}
-      <button onClick={() => setShowTips(!showTips)} style={{
-        width: "100%",
-        background: showTips ? "#1A1A1E" : "#1A1A1E",
-        border: "1px solid #2A2A32",
-        borderRadius: 12,
-        padding: "14px 20px",
-        color: "#F0EEF8",
-        fontFamily: "inherit",
-        fontSize: 13,
-        cursor: "pointer",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: showTips ? 0 : 0
-      }}>
-        <span>🎉 Partiful-Specific Tips</span>
-        <span style={{ color: "#666" }}>{showTips ? "▲" : "▼"}</span>
-      </button>
-      {showTips && (
-        <div style={{ background: "#13131A", border: "1px solid #2A2A32", borderTop: "none", borderRadius: "0 0 12px 12px", padding: "20px" }}>
-          {plan.partifulTips.map((tip, i) => (
-            <div key={i} style={{
-              display: "flex", gap: 12, paddingBottom: 14,
-              borderBottom: i < plan.partifulTips.length - 1 ? "1px solid #1E1E28" : "none",
-              marginBottom: 14
-            }}>
-              <span style={{ color: "#FF4F9A", fontSize: 13, flexShrink: 0 }}>→</span>
-              <span style={{ fontSize: 13, color: "#AAA", lineHeight: 1.6 }}>{tip}</span>
+          {/* Phase tabs */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+            {plan.phases.map((p, i) => (
+              <button key={i} onClick={() => setActivePhase(i)} style={{
+                background: activePhase === i ? p.color : "#1A1A1E",
+                color: activePhase === i ? "#fff" : "#888",
+                border: "none",
+                borderRadius: 8,
+                padding: "8px 16px",
+                fontSize: 12,
+                fontFamily: "inherit",
+                cursor: "pointer",
+                fontWeight: 600,
+                transition: "all 0.2s",
+                letterSpacing: 0.5
+              }}>
+                {p.label} · {p.duration}
+              </button>
+            ))}
+          </div>
+
+          {/* Phase card */}
+          <div style={{ background: "#13131A", borderRadius: 16, padding: "24px", marginBottom: 20, border: `1px solid ${phase.color}22` }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 18, fontWeight: 700, fontFamily: "'DM Serif Display', Georgia, serif", color: phase.color }}>{phase.title}</span>
+              <span style={{ fontSize: 11, color: "#555", letterSpacing: 1 }}>{phase.duration}</span>
             </div>
-          ))}
-        </div>
+            <p style={{ margin: 0, fontSize: 13, color: "#AAA", lineHeight: 1.6 }}>{phase.goal}</p>
+          </div>
+
+          {/* Topics */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 24 }}>
+            {phase.topics.map((topic, ti) => (
+              <div key={ti} style={{ background: "#13131A", borderRadius: 12, padding: "20px", border: "1px solid #1E1E28" }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#F0EEF8", marginBottom: 12 }}>
+                  {topic.ds}
+                </div>
+
+                {/* Patterns */}
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: "#555", textTransform: "uppercase", marginBottom: 6 }}>Patterns</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {topic.patterns.map((p, pi) => (
+                      <span
+                        key={pi}
+                        onClick={() => {
+                          setActivePatternKey({ phaseIndex: activePhase, topicIndex: ti, patternName: p });
+                          setView('pattern');
+                        }}
+                        style={{
+                          background: phase.accent + "22",
+                          color: phase.color,
+                          fontSize: 11,
+                          padding: "3px 10px",
+                          borderRadius: 20,
+                          border: `1px solid ${phase.color}33`,
+                          cursor: 'pointer',
+                          transition: 'opacity 0.15s',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.75')}
+                        onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                      >{p}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Problems */}
+                <div style={{ marginBottom: 12 }}>
+                  <div style={{ fontSize: 10, letterSpacing: 2, color: "#555", textTransform: "uppercase", marginBottom: 8 }}>Problems</div>
+                  {topic.problems.map((prob, pi) => {
+                    const key = `${activePhase}-${ti}-${pi}`;
+                    const done = checked[key];
+                    return (
+                      <div key={pi} onClick={() => toggle(key)} style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "7px 0", cursor: "pointer",
+                        borderBottom: pi < topic.problems.length - 1 ? "1px solid #1E1E28" : "none"
+                      }}>
+                        <span style={{ color: done ? phase.color : "#333", flexShrink: 0 }}><CheckIcon /></span>
+                        <span style={{
+                          fontSize: 13,
+                          color: done ? "#555" : "#CCC",
+                          textDecoration: done ? "line-through" : "none",
+                          transition: "all 0.2s"
+                        }}>{prob}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Tip */}
+                <div style={{
+                  background: "#0D0D12",
+                  borderLeft: `3px solid ${phase.color}`,
+                  padding: "10px 14px",
+                  borderRadius: "0 6px 6px 0",
+                  fontSize: 12,
+                  color: "#888",
+                  lineHeight: 1.6
+                }}>
+                  💡 {topic.tip}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Partiful-specific tips */}
+          <button onClick={() => setShowTips(!showTips)} style={{
+            width: "100%",
+            background: showTips ? "#1A1A1E" : "#1A1A1E",
+            border: "1px solid #2A2A32",
+            borderRadius: 12,
+            padding: "14px 20px",
+            color: "#F0EEF8",
+            fontFamily: "inherit",
+            fontSize: 13,
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: showTips ? 0 : 0
+          }}>
+            <span>🎉 Partiful-Specific Tips</span>
+            <span style={{ color: "#666" }}>{showTips ? "▲" : "▼"}</span>
+          </button>
+          {showTips && (
+            <div style={{ background: "#13131A", border: "1px solid #2A2A32", borderTop: "none", borderRadius: "0 0 12px 12px", padding: "20px" }}>
+              {plan.partifulTips.map((tip, i) => (
+                <div key={i} style={{
+                  display: "flex", gap: 12, paddingBottom: 14,
+                  borderBottom: i < plan.partifulTips.length - 1 ? "1px solid #1E1E28" : "none",
+                  marginBottom: 14
+                }}>
+                  <span style={{ color: "#FF4F9A", fontSize: 13, flexShrink: 0 }}>→</span>
+                  <span style={{ fontSize: 13, color: "#AAA", lineHeight: 1.6 }}>{tip}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
