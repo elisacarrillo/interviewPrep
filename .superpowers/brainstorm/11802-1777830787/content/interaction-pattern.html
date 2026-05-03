@@ -1,0 +1,96 @@
+<h2>How should clicking a pattern pill work?</h2>
+<p class="subtitle">Three interaction patterns — each with a different feel</p>
+
+<div class="cards">
+
+  <!-- Option A: Modal -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0D0D0F;padding:16px;border-radius:8px;font-family:'DM Mono',monospace;">
+      <!-- Simulated app with modal overlay -->
+      <div style="opacity:0.4;font-size:10px;color:#888;margin-bottom:8px;">Topics card</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+        <span style="background:#FF4F9A22;color:#FF4F9A;font-size:9px;padding:2px 8px;border-radius:12px;border:1px solid #FF4F9A44;">Two Pointers</span>
+        <span style="background:#FF4F9A22;color:#FF4F9A;font-size:9px;padding:2px 8px;border-radius:12px;border:1px solid #FF4F9A44;outline:2px solid #FF4F9A;outline-offset:1px;">Sliding Window ←clicked</span>
+      </div>
+      <!-- Modal -->
+      <div style="background:#1A1A24;border:1px solid #FF4F9A55;border-radius:10px;padding:12px;position:relative;">
+        <div style="font-size:9px;color:#FF4F9A;font-weight:700;margin-bottom:6px;">SLIDING WINDOW</div>
+        <div style="font-size:9px;color:#888;line-height:1.5;margin-bottom:8px;">Maintain a window of elements. Expand right, shrink left when condition breaks.</div>
+        <!-- mini diagram -->
+        <div style="display:flex;gap:2px;margin-bottom:6px;">
+          <div style="width:14px;height:14px;background:#333;border-radius:2px;font-size:7px;color:#666;display:flex;align-items:center;justify-content:center;">1</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">2</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">3</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">4</div>
+          <div style="width:14px;height:14px;background:#333;border-radius:2px;font-size:7px;color:#666;display:flex;align-items:center;justify-content:center;">5</div>
+          <span style="font-size:7px;color:#FF4F9A;align-self:center;margin-left:2px;">window</span>
+        </div>
+        <div style="font-size:8px;color:#555;">✕ close</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Modal / Popup</h3>
+      <p>Clicking a pill opens a floating overlay with the visualization and tip. Focused, dismissable. Doesn't disturb the layout.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Inline Expand -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0D0D0F;padding:16px;border-radius:8px;font-family:'DM Mono',monospace;">
+      <div style="opacity:0.4;font-size:10px;color:#888;margin-bottom:8px;">Topics card</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">
+        <span style="background:#FF4F9A22;color:#FF4F9A;font-size:9px;padding:2px 8px;border-radius:12px;border:1px solid #FF4F9A44;">Two Pointers</span>
+        <span style="background:#FF4F9A;color:#fff;font-size:9px;padding:2px 8px;border-radius:12px;">Sliding Window ▼</span>
+      </div>
+      <!-- Inline expansion -->
+      <div style="background:#13131A;border:1px solid #FF4F9A33;border-radius:0 0 8px 8px;border-top:2px solid #FF4F9A;padding:10px;margin-bottom:6px;">
+        <div style="display:flex;gap:2px;margin-bottom:6px;">
+          <div style="width:14px;height:14px;background:#333;border-radius:2px;font-size:7px;color:#666;display:flex;align-items:center;justify-content:center;">1</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">2</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">3</div>
+          <div style="width:14px;height:14px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;font-size:7px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">4</div>
+          <div style="width:14px;height:14px;background:#333;border-radius:2px;font-size:7px;color:#666;display:flex;align-items:center;justify-content:center;">5</div>
+        </div>
+        <div style="font-size:9px;color:#888;line-height:1.5;">Maintain a window. Expand right, shrink left when broken.</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        <span style="background:#FF4F9A22;color:#FF4F9A;font-size:9px;padding:2px 8px;border-radius:12px;border:1px solid #FF4F9A44;">Frequency Count</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Inline Expansion</h3>
+      <p>Pill toggles open a panel directly below it, inline within the card. Contextual — feels like part of the content. Can open multiple at once.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Side Drawer -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0D0D0F;padding:0;border-radius:8px;font-family:'DM Mono',monospace;overflow:hidden;display:flex;">
+      <!-- Main content (compressed) -->
+      <div style="flex:1;padding:12px;min-width:0;">
+        <div style="opacity:0.4;font-size:10px;color:#888;margin-bottom:8px;">Topics card</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          <span style="background:#FF4F9A22;color:#FF4F9A;font-size:9px;padding:2px 8px;border-radius:12px;border:1px solid #FF4F9A44;">Two Pointers</span>
+          <span style="background:#FF4F9A;color:#fff;font-size:9px;padding:2px 8px;border-radius:12px;">Sliding→</span>
+        </div>
+      </div>
+      <!-- Side panel -->
+      <div style="width:110px;background:#13131A;border-left:2px solid #FF4F9A;padding:10px;flex-shrink:0;">
+        <div style="font-size:8px;color:#FF4F9A;font-weight:700;margin-bottom:4px;">SLIDING WINDOW</div>
+        <div style="display:flex;gap:1px;margin-bottom:6px;">
+          <div style="width:10px;height:10px;background:#333;border-radius:2px;"></div>
+          <div style="width:10px;height:10px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;"></div>
+          <div style="width:10px;height:10px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;"></div>
+          <div style="width:10px;height:10px;background:#FF4F9A33;border:1px solid #FF4F9A;border-radius:2px;"></div>
+          <div style="width:10px;height:10px;background:#333;border-radius:2px;"></div>
+        </div>
+        <div style="font-size:8px;color:#888;line-height:1.4;">Expand right, shrink left on break.</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Side Drawer</h3>
+      <p>Clicking a pill slides open a panel on the right. Good for richer content. Keeps the main layout visible while you explore.</p>
+    </div>
+  </div>
+
+</div>

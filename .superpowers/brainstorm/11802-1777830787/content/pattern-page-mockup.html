@@ -1,0 +1,101 @@
+<h2>Pattern page — full mockup</h2>
+<p class="subtitle">Showing "Sliding Window" — does this layout feel right?</p>
+
+<div class="mockup">
+  <div class="mockup-header">Pattern Detail Page · click a pill → this page</div>
+  <div class="mockup-body" style="background:#0D0D0F;font-family:'DM Mono',monospace;padding:0;border-radius:0 0 8px 8px;overflow:hidden;">
+
+    <!-- Top nav bar -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid #1E1E28;">
+      <span style="font-size:10px;color:#666;cursor:pointer;">← Back to study plan</span>
+      <div style="display:flex;gap:12px;">
+        <span style="font-size:10px;color:#555;">← Two Pointers</span>
+        <span style="font-size:10px;color:#555;">Frequency Count →</span>
+      </div>
+    </div>
+
+    <div style="padding:20px 16px;">
+
+      <!-- Header -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:9px;color:#FF4F9A;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Phase 1 · Arrays & Hash Maps</div>
+        <div style="font-size:22px;font-weight:700;color:#F0EEF8;line-height:1.1;">Sliding Window</div>
+      </div>
+
+      <!-- SECTION 1: Step-by-step visual -->
+      <div style="background:#13131A;border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid #1E1E28;">
+        <div style="font-size:8px;color:#555;letter-spacing:2px;margin-bottom:12px;">HOW IT MOVES</div>
+
+        <!-- Step 1 -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:9px;color:#FF85C2;margin-bottom:5px;">① Initialize — left and right both at 0</div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;font-weight:700;">a</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">b</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">c</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">d</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">e</div>
+            <span style="font-size:9px;color:#555;margin-left:6px;">window=[a]</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="margin-bottom:10px;">
+          <div style="font-size:9px;color:#FF85C2;margin-bottom:5px;">② Expand right — constraint still valid</div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">a</div>
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">b</div>
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">c</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">d</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">e</div>
+            <span style="font-size:9px;color:#555;margin-left:6px;">window=[a,b,c]</span>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div>
+          <div style="font-size:9px;color:#E8007A;margin-bottom:5px;">③ Shrink left — constraint broken, move left pointer</div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <div style="width:28px;height:28px;background:#13131A;border:1.5px dashed #333;border-radius:4px;font-size:10px;color:#333;display:flex;align-items:center;justify-content:center;">a</div>
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">b</div>
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">c</div>
+            <div style="width:28px;height:28px;background:#FF4F9A33;border:1.5px solid #FF4F9A;border-radius:4px;font-size:10px;color:#FF4F9A;display:flex;align-items:center;justify-content:center;">d</div>
+            <div style="width:28px;height:28px;background:#1E1E28;border-radius:4px;font-size:10px;color:#444;display:flex;align-items:center;justify-content:center;">e</div>
+            <span style="font-size:9px;color:#555;margin-left:6px;">window=[b,c,d]</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Annotated code skeleton -->
+      <div style="background:#13131A;border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid #1E1E28;">
+        <div style="font-size:8px;color:#555;letter-spacing:2px;margin-bottom:12px;">CODE SHAPE</div>
+        <div style="font-size:10px;line-height:2;">
+          <div><span style="color:#888;">left</span> <span style="color:#555;">=</span> <span style="color:#FF85C2;">0</span></div>
+          <div><span style="color:#888;">for</span> <span style="color:#FF4F9A;">right</span> <span style="color:#555;">in range(len(arr)):</span></div>
+          <div style="padding-left:14px;border-left:2px solid #FF4F9A55;margin-left:2px;">
+            <div style="color:#555;">  <span style="color:#666;"># ① add arr[right] to window</span></div>
+            <div><span style="color:#888;">  while</span> <span style="color:#FF85C2;">window_is_invalid</span><span style="color:#555;">():</span></div>
+            <div style="padding-left:12px;border-left:2px solid #E8007A55;margin-left:2px;">
+              <div><span style="color:#555;">    </span><span style="color:#666;"># ③ remove arr[left], left += 1</span></div>
+            </div>
+            <div style="color:#555;">  <span style="color:#666;"># ② record best result</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: Tip + problems -->
+      <div style="border-left:3px solid #FF4F9A;padding:8px 12px;font-size:10px;color:#AAA;line-height:1.6;margin-bottom:14px;">
+        💡 Use when the problem asks for the longest/shortest subarray satisfying a condition. The key insight: a valid window only shrinks from the left.
+      </div>
+
+      <div>
+        <div style="font-size:8px;color:#555;letter-spacing:2px;margin-bottom:8px;">PROBLEMS USING THIS PATTERN</div>
+        <div style="font-size:10px;color:#888;padding:5px 0;border-bottom:1px solid #1E1E28;">· Longest Substring Without Repeating Characters</div>
+        <div style="font-size:10px;color:#888;padding:5px 0;">· Maximum Subarray of Size K</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Does this layout feel right? Any sections to add, remove, or rearrange?</p>
