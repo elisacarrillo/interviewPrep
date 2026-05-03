@@ -11,3 +11,12 @@ def twoSum(self, nums: List[int], target: int) -> List[int]:
             seen[num] = i
          
 ```
+
+## Contains Duplicate
+
+```python
+def hasDuplicate(self, nums: List[int]) -> bool:
+    sety = set(nums)
+    return not (len(sety) == len(nums))
+
+```
