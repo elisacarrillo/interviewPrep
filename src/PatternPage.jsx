@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { slugify } from './parsePatterns';
 
 const DEMO = ['a', 'b', 'c', 'd', 'e'];
@@ -60,6 +60,8 @@ function NotesSection({ patternName }) {
   const key = `pattern-notes-${slugify(patternName)}`;
   const [notes, setNotes] = useState(() => localStorage.getItem(key) || '');
   const timerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const handleChange = (e) => {
     const val = e.target.value;
