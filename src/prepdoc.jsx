@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import PatternPage from "./PatternPage";
+import { parsePatterns, parseSolvedProblem } from "./parsePatterns";
+import patternsRaw from "./patterns.md?raw";
 
 const codeTheme = {
   ...oneDark,
   'pre[class*="language-"]': { ...oneDark['pre[class*="language-"]'], background: 'transparent', margin: 0 },
   'code[class*="language-"]': { ...oneDark['code[class*="language-"]'], background: 'transparent' },
 };
-import PatternPage from "./PatternPage";
-import { parsePatterns, parseSolvedProblem } from "./parsePatterns";
-import patternsRaw from "./patterns.md?raw";
 
 const parsedPatterns = parsePatterns(patternsRaw);
 
@@ -24,6 +24,8 @@ const solvedProblems = Object.entries(rawFiles)
   .map(([, raw]) => parseSolvedProblem(raw));
 
 const solvedTitles = new Set(solvedProblems.map(p => p.title.toLowerCase().trim()));
+
+const solvedByTitle = Object.fromEntries(solvedProblems.map(p => [p.title.toLowerCase().trim(), p]));
 
 const plan = {
   phases: [
@@ -230,33 +232,56 @@ export default function StudyPlan() {
               fontWeight: 600,
               transition: 'all 0.2s',
               letterSpacing: 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
             }}
           >
             {label}
+            {key === 'solved' && solvedProblems.length > 0 && (
+              <span style={{
+                background: view === 'solved' ? 'rgba(255,255,255,0.25)' : '#FF4F9A22',
+                color: view === 'solved' ? '#fff' : '#FF4F9A',
+                fontSize: 10,
+                fontWeight: 700,
+                padding: '1px 6px',
+                borderRadius: 10,
+                lineHeight: '16px',
+              }}>
+                {solvedProblems.length}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
       {view === 'solved' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
           {solvedProblems.length === 0 ? (
             <div style={{ color: '#555', fontSize: 13, textAlign: 'center', padding: 40 }}>
               No solved problems yet.
             </div>
-          ) : (
-            solvedProblems.map(({ title, language, code }, i) => (
-              <div key={i} style={{ background: '#13131A', borderRadius: 12, padding: '20px', border: '1px solid #1E1E28' }}>
+          ) : (() => {
+            const groups = plan.phases.flatMap(ph =>
+              ph.topics
+                .map(topic => ({
+                  ph,
+                  topic,
+                  solved: topic.problems.map(prob => solvedByTitle[prob.toLowerCase().trim()]).filter(Boolean),
+                }))
+                .filter(g => g.solved.length > 0)
+            );
+            const matchedTitles = new Set(groups.flatMap(g => g.solved.map(s => s.title.toLowerCase().trim())));
+            const unmatched = solvedProblems.filter(s => !matchedTitles.has(s.title.toLowerCase().trim()));
+
+            const SolvedCard = ({ title, language, code }) => (
+              <div style={{ background: '#13131A', borderRadius: 12, padding: '20px', border: '1px solid #1E1E28' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <span style={{ fontSize: 16, fontWeight: 600, color: '#F0EEF8' }}>{title}</span>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#F0EEF8' }}>{title}</span>
                   {language && (
-                    <span style={{
-                      background: '#FF4F9A22',
-                      color: '#FF4F9A',
-                      fontSize: 11,
-                      padding: '2px 8px',
-                      borderRadius: 20,
-                      border: '1px solid #FF4F9A33',
-                    }}>{language}</span>
+                    <span style={{ background: '#FF4F9A22', color: '#FF4F9A', fontSize: 11, padding: '2px 8px', borderRadius: 20, border: '1px solid #FF4F9A33' }}>
+                      {language}
+                    </span>
                   )}
                 </div>
                 <div style={{ background: '#080810', borderRadius: 8, padding: 16, overflow: 'auto' }}>
@@ -270,8 +295,44 @@ export default function StudyPlan() {
                   </SyntaxHighlighter>
                 </div>
               </div>
-            ))
-          )}
+            );
+
+            return (
+              <>
+                {groups.map(({ ph, topic, solved }, gi) => (
+                  <div key={gi} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: '#555', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>
+                        {ph.label}
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: '#F0EEF8', marginBottom: 8 }}>
+                        {topic.ds}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {topic.patterns.map((p, pi) => (
+                          <span key={pi} style={{
+                            background: ph.accent + '22',
+                            color: ph.color,
+                            fontSize: 11,
+                            padding: '3px 10px',
+                            borderRadius: 20,
+                            border: `1px solid ${ph.color}33`,
+                          }}>{p}</span>
+                        ))}
+                      </div>
+                    </div>
+                    {solved.map((s, i) => <SolvedCard key={i} {...s} />)}
+                  </div>
+                ))}
+                {unmatched.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <div style={{ fontSize: 10, color: '#555', letterSpacing: 2, textTransform: 'uppercase' }}>Other</div>
+                    {unmatched.map((s, i) => <SolvedCard key={i} {...s} />)}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       ) : (
         <>
