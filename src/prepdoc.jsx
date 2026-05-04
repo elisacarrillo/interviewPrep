@@ -15,6 +15,8 @@ const solvedProblems = Object.entries(rawFiles)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([, raw]) => parseSolvedProblem(raw));
 
+const solvedTitles = new Set(solvedProblems.map(p => p.title.toLowerCase().trim()));
+
 const plan = {
   phases: [
     {
@@ -132,8 +134,15 @@ export default function StudyPlan() {
 
   const phase = plan.phases[activePhase];
 
-  const totalProblems = plan.phases.flatMap(p => p.topics.flatMap(t => t.problems)).length;
-  const doneCount = Object.values(checked).filter(Boolean).length;
+  const allProblems = plan.phases.flatMap((ph, phi) =>
+    ph.topics.flatMap((t, ti) =>
+      t.problems.map((prob, pi) => ({ prob, key: `${phi}-${ti}-${pi}` }))
+    )
+  );
+  const totalProblems = allProblems.length;
+  const doneCount = allProblems.filter(({ prob, key }) =>
+    checked[key] || solvedTitles.has(prob.toLowerCase().trim())
+  ).length;
   const pct = Math.round((doneCount / totalProblems) * 100);
 
   if (view === 'pattern' && activePatternKey) {
@@ -177,6 +186,7 @@ export default function StudyPlan() {
         nextPattern={nextPattern}
         onNavigate={(key) => setActivePatternKey(key)}
         relatedProblems={relatedProblems}
+        solvedTitles={solvedTitles}
       />
     );
   }
@@ -346,7 +356,7 @@ export default function StudyPlan() {
                   <div style={{ fontSize: 10, letterSpacing: 2, color: "#555", textTransform: "uppercase", marginBottom: 8 }}>Problems</div>
                   {topic.problems.map((prob, pi) => {
                     const key = `${activePhase}-${ti}-${pi}`;
-                    const done = checked[key];
+                    const done = checked[key] || solvedTitles.has(prob.toLowerCase().trim());
                     return (
                       <div key={pi} onClick={() => toggle(key)} style={{
                         display: "flex", alignItems: "center", gap: 10,

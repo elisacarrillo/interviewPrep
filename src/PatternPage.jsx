@@ -108,6 +108,7 @@ export default function PatternPage({
   nextPattern,
   onNavigate,
   relatedProblems,
+  solvedTitles = new Set(),
 }) {
   const navBtn = {
     background: 'none', border: 'none', color: '#555', fontSize: 11,
@@ -183,16 +184,29 @@ export default function PatternPage({
             {relatedProblems.length > 0 && (
               <div style={{ background: '#13131A', borderRadius: 10, padding: 16, marginBottom: 14, border: '1px solid #1E1E28' }}>
                 <div style={{ fontSize: 9, color: '#555', letterSpacing: 2, textTransform: 'uppercase', marginBottom: 10 }}>
-                  Problems using this pattern
+                  Related Problems
                 </div>
-                {relatedProblems.map((p, i) => (
-                  <div key={i} style={{
-                    fontSize: 12, color: '#888', padding: '5px 0',
-                    borderBottom: i < relatedProblems.length - 1 ? '1px solid #1E1E28' : 'none',
-                  }}>
-                    · {p}
-                  </div>
-                ))}
+                {relatedProblems.map((p, i) => {
+                  const solved = solvedTitles.has(p.toLowerCase().trim());
+                  return (
+                    <div key={i} style={{
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      fontSize: 12, padding: '5px 0',
+                      borderBottom: i < relatedProblems.length - 1 ? '1px solid #1E1E28' : 'none',
+                    }}>
+                      <span style={{ color: solved ? phaseColor : '#333', flexShrink: 0 }}>
+                        <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                          <circle cx="8" cy="8" r="7" fill="currentColor" opacity="0.15"/>
+                          <path d="M4.5 8L7 10.5L11.5 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </span>
+                      <span style={{
+                        color: solved ? '#555' : '#888',
+                        textDecoration: solved ? 'line-through' : 'none',
+                      }}>{p}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
