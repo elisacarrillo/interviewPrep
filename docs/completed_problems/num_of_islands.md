@@ -1,4 +1,4 @@
-## Number of Islands
+## Number of Islands (BFS)
 
 ```python
 class Solution:
