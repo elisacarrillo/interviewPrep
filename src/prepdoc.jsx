@@ -1,4 +1,12 @@
 import { useState } from "react";
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const codeTheme = {
+  ...oneDark,
+  'pre[class*="language-"]': { ...oneDark['pre[class*="language-"]'], background: 'transparent', margin: 0 },
+  'code[class*="language-"]': { ...oneDark['code[class*="language-"]'], background: 'transparent' },
+};
 import PatternPage from "./PatternPage";
 import { parsePatterns, parseSolvedProblem } from "./parsePatterns";
 import patternsRaw from "./patterns.md?raw";
@@ -251,18 +259,16 @@ export default function StudyPlan() {
                     }}>{language}</span>
                   )}
                 </div>
-                <pre style={{
-                  background: '#0D0D12',
-                  borderRadius: 8,
-                  padding: 16,
-                  fontSize: 12,
-                  color: '#CCC',
-                  overflowX: 'auto',
-                  fontFamily: 'inherit',
-                  margin: 0,
-                }}>
-                  <code>{code}</code>
-                </pre>
+                <div style={{ background: '#080810', borderRadius: 8, padding: 16, overflow: 'auto' }}>
+                  <SyntaxHighlighter
+                    language={language || 'python'}
+                    style={codeTheme}
+                    customStyle={{ fontSize: 12, margin: 0, padding: 0, fontFamily: "'DM Mono', 'Fira Mono', monospace" }}
+                    codeTagProps={{ style: { display: 'block', fontFamily: 'inherit', background: 'transparent', padding: 0 } }}
+                  >
+                    {code}
+                  </SyntaxHighlighter>
+                </div>
               </div>
             ))
           )}
