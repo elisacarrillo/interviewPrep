@@ -6,8 +6,8 @@ import { getAllSolutions } from './parseSolution.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const problems = JSON.parse(readFileSync(join(__dirname, '../../src/problems.json'), 'utf8'));
 
-export function computeWeakAreas() {
-  const solutions = getAllSolutions();
+export function computeWeakAreas(solutions) {
+  solutions = solutions ?? getAllSolutions();
   const categoryData = {};
 
   for (const problem of problems) {
