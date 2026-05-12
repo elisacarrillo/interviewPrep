@@ -2,14 +2,13 @@
 import { readSolution, writeSolution, patchSolution, getAllSolutions as getAllSolutionsFS } from './parseSolution.js';
 
 const KV_KEY = 'solutions';
-const USE_KV = !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+const REDIS_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+const USE_KV = !!(REDIS_URL && REDIS_TOKEN);
 
 async function getRedis() {
   const { Redis } = await import('@upstash/redis');
-  return new Redis({
-    url: process.env.UPSTASH_REDIS_REST_URL,
-    token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  });
+  return new Redis({ url: REDIS_URL, token: REDIS_TOKEN });
 }
 
 export async function getAllSolutionsAsync() {
